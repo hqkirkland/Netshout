@@ -1,0 +1,5 @@
+c:\users\administrator.enterprise\documents\visual studio 2013\Projects\Netshout\Netshout\bin\Debug\Netshout.dll
+c:\users\administrator.enterprise\documents\visual studio 2013\Projects\Netshout\Netshout\bin\Debug\Netshout.pdb
+c:\users\administrator.enterprise\documents\visual studio 2013\Projects\Netshout\Netshout\obj\Debug\Netshout.csprojResolveAssemblyReference.cache
+c:\users\administrator.enterprise\documents\visual studio 2013\Projects\Netshout\Netshout\obj\Debug\Netshout.dll
+c:\users\administrator.enterprise\documents\visual studio 2013\Projects\Netshout\Netshout\obj\Debug\Netshout.pdb
