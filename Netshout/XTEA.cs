@@ -21,6 +21,7 @@ namespace Netshout
                  * / 8, subtract that from 8, and create a byte of that result + the current
                  * size.
                  */
+		
                 DataBytes = new byte[DataStrBytes.Length + (8 - (DataStrBytes.Length % 8))];
             }
 
