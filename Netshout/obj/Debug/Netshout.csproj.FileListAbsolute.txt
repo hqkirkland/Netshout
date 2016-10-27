@@ -3,3 +3,8 @@ c:\users\administrator.enterprise\documents\visual studio 2013\Projects\Netshout
 c:\users\administrator.enterprise\documents\visual studio 2013\Projects\Netshout\Netshout\obj\Debug\Netshout.csprojResolveAssemblyReference.cache
 c:\users\administrator.enterprise\documents\visual studio 2013\Projects\Netshout\Netshout\obj\Debug\Netshout.dll
 c:\users\administrator.enterprise\documents\visual studio 2013\Projects\Netshout\Netshout\obj\Debug\Netshout.pdb
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\Netshout\bin\Debug\Netshout.dll
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\Netshout\bin\Debug\Netshout.pdb
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\Netshout\obj\Debug\Netshout.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\Netshout\obj\Debug\Netshout.dll
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\Netshout\obj\Debug\Netshout.pdb

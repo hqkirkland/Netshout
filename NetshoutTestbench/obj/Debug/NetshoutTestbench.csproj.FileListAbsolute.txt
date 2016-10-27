@@ -1,0 +1,8 @@
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\NetshoutTestbench\bin\Debug\NetshoutTestbench.exe.config
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\NetshoutTestbench\bin\Debug\NetshoutTestbench.exe
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\NetshoutTestbench\bin\Debug\NetshoutTestbench.pdb
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\NetshoutTestbench\bin\Debug\Netshout.dll
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\NetshoutTestbench\bin\Debug\Netshout.pdb
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\NetshoutTestbench\obj\Debug\NetshoutTestbench.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\NetshoutTestbench\obj\Debug\NetshoutTestbench.exe
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\NetshoutTestbench\obj\Debug\NetshoutTestbench.pdb
