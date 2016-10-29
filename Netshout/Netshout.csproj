@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Communication\Exceptions\AuthDenyException.cs" />
+    <Compile Include="Communication\Exceptions\MimeTypeException.cs" />
     <Compile Include="Communication\Exceptions\StreamInUseException.cs" />
     <Compile Include="Communication\Exceptions\ConfigurationIncompleteException.cs" />
     <Compile Include="Communication\Exceptions\CompatibilityModeDisabledException.cs" />

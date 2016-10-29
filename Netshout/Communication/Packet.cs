@@ -6,21 +6,19 @@ using System.Threading.Tasks;
 
 namespace Netshout.Communication
 {
-    class Packet
+    static class Packet
     {
-        byte[] UltravoxMessage = new byte[] { 0x5A, 0x0, 0x0, 0x0, 0x0, 0x0 };
-        byte[] LengthBytes;
-        byte[] Payload;
-
         /// <summary>
-        /// A packet instance of a message outbound to the DNAS server.
+        /// Serializes the packet into a byte array, allowing it to be sent over a socket.
         /// </summary>
         /// <param name="Flags">The MessageFlag corresponding to the message's Ultravox class and type.</param>
         /// <param name="PayloadData">The payload for the packet itself.</param>
-        public Packet(MessageFlag Flags, byte[] PayloadData)
+        /// <returns></returns>
+        public static byte[] Serialize(MessageFlag Flags, byte[] PayloadData)
         {
+            byte[] UltravoxMessage = new byte[] { 0x5A, 0x0, 0x0, 0x0, 0x0, 0x0 };
 
-            LengthBytes = BitConverter.GetBytes((Int16)(PayloadData.Length));
+            byte[] LengthBytes = BitConverter.GetBytes((Int16)(PayloadData.Length));
 
             if (BitConverter.IsLittleEndian)
             {
@@ -29,32 +27,25 @@ namespace Netshout.Communication
 
                 LengthBytes = LengthBytes.Reverse().ToArray();
             }
-
             
             Buffer.BlockCopy(BitConverter.GetBytes((short)(Flags)), 0, UltravoxMessage, 2, 2);
-            Payload = PayloadData;
 
-            if (Payload.Length > 255)
+            if (PayloadData.Length > 255)
             {
                 Buffer.BlockCopy(LengthBytes, 0, UltravoxMessage, 4, 2);
             }
 
             else
             {
-                UltravoxMessage[5] = Convert.ToByte(Payload.Length);
+                UltravoxMessage[5] = Convert.ToByte(PayloadData.Length);
             }
-        }
 
-        /// <summary>
-        /// Serializes the packet object into a byte array, allowing it to be sent over a socket.
-        /// </summary>
-        /// <returns></returns>
-        public byte[] Serialize()
-        {
-            byte[] FinalBytes = new byte[UltravoxMessage.Length + Payload.Length + 1];
+            byte[] FinalBytes = new byte[UltravoxMessage.Length + PayloadData.Length + 1];
 
             Buffer.BlockCopy(UltravoxMessage, 0, FinalBytes, 0, UltravoxMessage.Length);
-            Buffer.BlockCopy(Payload, 0, FinalBytes, UltravoxMessage.Length, Payload.Length);
+            Buffer.BlockCopy(PayloadData, 0, FinalBytes, UltravoxMessage.Length, PayloadData.Length);
+
+            UltravoxMessage = new byte[] { 0x5A, 0x0, 0x0, 0x0, 0x0, 0x0 };
 
             return FinalBytes;
         }

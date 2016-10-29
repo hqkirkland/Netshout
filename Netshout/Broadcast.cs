@@ -28,6 +28,7 @@ namespace Netshout
 
             set
             {
+                Disconnect();
                 SourceSocket = value;
             }
         }
@@ -70,9 +71,9 @@ namespace Netshout
 
             set
             {
-                _IcyName = value;
-                ClientSocket.Send(new Packet(MessageFlag.IcyName, Encoding.Default.GetBytes(_IcyName)).Serialize());
+                ClientSocket.Send(Packet.Serialize(MessageFlag.IcyName, Encoding.Default.GetBytes(value)));
                 ReceiveAck();
+                _IcyName = value;
             }
         }
 
@@ -88,9 +89,9 @@ namespace Netshout
 
             set
             {
-                _IcyGenre = value;
-                ClientSocket.Send(new Packet(MessageFlag.IcyGenre, Encoding.Default.GetBytes(_IcyGenre)).Serialize());
+                ClientSocket.Send(Packet.Serialize(MessageFlag.IcyGenre, Encoding.Default.GetBytes(value)));
                 ReceiveAck();
+                _IcyGenre = value;
             }
         }
 
@@ -106,9 +107,9 @@ namespace Netshout
 
             set
             {
-                _IcyUrl = value;
-                ClientSocket.Send(new Packet(MessageFlag.IcyUrl, Encoding.Default.GetBytes(_IcyUrl)).Serialize());
+                ClientSocket.Send(Packet.Serialize(MessageFlag.IcyUrl, Encoding.Default.GetBytes(value)));
                 ReceiveAck();
+                _IcyUrl = value;
             }
         }
 
@@ -124,17 +125,12 @@ namespace Netshout
 
             set
             {
-                _IcyPub = value;
-                int Public = (_IcyPub) ? 1 : 0;
-                ClientSocket.Send(new Packet(MessageFlag.IcyPub, Encoding.Default.GetBytes(Public.ToString())).Serialize());
+                int Public = (value) ? 1 : 0;
+                ClientSocket.Send(Packet.Serialize(MessageFlag.IcyPub, Encoding.Default.GetBytes(Public.ToString())));
                 ReceiveAck();
+                _IcyPub = value;
             }
         }
-
-        /// <summary>
-        /// Internet MIME type corresponding to the audio's encoded format.
-        /// </summary>
-        public readonly String MimeType;
 
         #endregion
 
@@ -142,6 +138,7 @@ namespace Netshout
 
         // Just in case someone needs to change it.
         public String Version = "2.1";
+        public String AudioMimeType;
         public bool Authenticated;
         public bool StreamReady;
 
@@ -161,11 +158,6 @@ namespace Netshout
         private String _IcyGenre;
         private String _IcyUrl;
         private bool _IcyPub;
-
-        private bool IsAsync;
-
-        private AsyncCallback DataSent;
-        private AsyncCallback DataReceived;
 
         private byte[] IncomingBuffer = new byte[128];
 
@@ -209,7 +201,7 @@ namespace Netshout
         {
             /* Cipher Request */
             byte[] RequestPayload = Encoding.Default.GetBytes("2.1");
-            byte[] CipherPacket = new Packet(MessageFlag.RequestCipher, RequestPayload).Serialize();
+            byte[] CipherPacket = Packet.Serialize(MessageFlag.RequestCipher, RequestPayload);
 
             SourceSocket.Send(CipherPacket);
             String[] Response = ReceiveAck();
@@ -240,7 +232,7 @@ namespace Netshout
             String AuthenticationString = Version + ":" + StreamNum.ToString() + ":" + XteaEncryptedUser + ":" + XteaEncryptedPassword;
 
             byte[] AuthBytes = Encoding.Default.GetBytes(AuthenticationString);
-            SourceSocket.Send(new Packet(MessageFlag.Authenticate, AuthBytes).Serialize());
+            SourceSocket.Send(Packet.Serialize(MessageFlag.Authenticate, AuthBytes));
 
             if (ReceiveAck()[2] == "Allow")
             {
@@ -254,7 +246,8 @@ namespace Netshout
         /// <param name="MimeType">The MIME type for the audio data that will be sent to the server.</param>
         public void SetMimeType(String MimeType)
         {
-            SourceSocket.Send(new Packet(MessageFlag.SetMimeType, Encoding.Default.GetBytes(MimeType)).Serialize());
+            AudioMimeType = MimeType;
+            SourceSocket.Send(Packet.Serialize(MessageFlag.SetMimeType, Encoding.Default.GetBytes(MimeType)));
             ReceiveAck();
         }
 
@@ -266,14 +259,14 @@ namespace Netshout
         public void SetBitrate(int AverageBitrate, int MaximumBitrate)
         {
             String BitratePayload = (AverageBitrate * 1000).ToString() + ":" + (MaximumBitrate * 1000);
-            SourceSocket.Send(new Packet(MessageFlag.Setup, Encoding.Default.GetBytes(BitratePayload)).Serialize());
+            SourceSocket.Send(Packet.Serialize(MessageFlag.Setup, Encoding.Default.GetBytes(BitratePayload)));
 
             try
             {
                 ReceiveAck();
             }
 
-            catch(BitrateDeniedException E)
+            catch(BitrateDeniedException)
             {
                 throw;
             }
@@ -288,7 +281,7 @@ namespace Netshout
         public int NegotiateBufferSize(int DesiredSize, int MinimumSize)
         {
             String NegotiationPayload = DesiredSize.ToString() + ":" + MinimumSize.ToString();
-            SourceSocket.Send(new Packet(MessageFlag.NegotiateBufferSize, Encoding.Default.GetBytes(NegotiationPayload)).Serialize());
+            SourceSocket.Send(Packet.Serialize(MessageFlag.NegotiateBufferSize, Encoding.Default.GetBytes(NegotiationPayload)));
 
             String NegotiatedSize = ReceiveAck()[1];
 
@@ -303,7 +296,7 @@ namespace Netshout
         /// </summary>
         public bool Standby()
         {
-            SourceSocket.Send(new Packet(MessageFlag.Standby, new byte[0]).Serialize());
+            SourceSocket.Send(Packet.Serialize(MessageFlag.Standby, new byte[0]));
 
             String[] ResponseArray = ReceiveAck();
 
@@ -321,7 +314,7 @@ namespace Netshout
         /// </summary>
         public void FlushCachedMetadata()
         {
-            SourceSocket.Send(new Packet(MessageFlag.FlushMetadata, new byte[0]).Serialize());
+            SourceSocket.Send(Packet.Serialize(MessageFlag.FlushMetadata, new byte[0]));
             ReceiveAck();
         }
 
@@ -349,10 +342,7 @@ namespace Netshout
             using (StringWriter Writer = new StringWriter(Sb))
             {
                 Serializer.Serialize(Writer, MetadataInstance, XmlNamespaces);
-                String TestExtra = "<extension><title seq=\"1\">Grace Mullahey - Into You vs. Fast Car</title></extension>";
-                String XmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadata><TIT2>Into You vs. Fast Car</TIT2><TPE1>Grace Mullahey</TPE1><TLEN>200673</TLEN><TXXX id=\"picture\">az_37__Grace Mullahey.jpg</TXXX><TXXX id=\"songtype\">S</TXXX><TENC>SAM Broadcaster PRO 2016.8</TENC><TRSN>DJ-Monk</TRSN><WORS>http://dev.nodebay.com/</WORS><extension><title seq=\"1\">Grace Mullahey - Into You vs. Fast Car</title></extension></metadata>\r\n";
-                // (Writer.ToString().Replace("utf-16", "UTF-8").Replace("\r\n  ", "").Replace("\r\n</metadata>", "</metadata>\r\n")
-                XmlBytes = Encoding.UTF8.GetBytes(XmlString);
+                XmlBytes = Encoding.UTF8.GetBytes(Writer.ToString().Replace("utf-16", "UTF-8"));
                 Array.Resize<byte>(ref XmlBytes, XmlBytes.Length + 6);
 
                 Buffer.BlockCopy(XmlBytes, 0, XmlBytes, 6, XmlBytes.Length - 6);
@@ -361,7 +351,7 @@ namespace Netshout
 
             Console.WriteLine(Encoding.UTF8.GetString(XmlBytes));
 
-            SourceSocket.Send(new Packet(MessageFlag.ShoutcastXmlMetadata, XmlBytes).Serialize());
+            SourceSocket.Send(Packet.Serialize(MessageFlag.ShoutcastXmlMetadata, XmlBytes));
         }
 
         /// <summary>
@@ -374,21 +364,55 @@ namespace Netshout
         }
 
         /// <summary>
-        /// Negotiates the maximum payload size for data transfer mode. Currently unused.
+        /// Negotiates the maximum payload size for data transfer mode.
         /// </summary>
         /// <param name="DesiredSize">Desired maximum payload size.</param>
-        /// <param name="MinimumMaxSize">Minimum payload size.</param>
+        /// <param name="MinimumSize">Minimum payload size.</param>
         /// <returns></returns>
-        public int NegotiateMaxPayloadSize(int DesiredSize, int MinimumMaxSize)
+        public int NegotiateMaxPayloadSize(int DesiredSize, int MinimumSize)
         {
-            String NegotiationPayload = DesiredSize.ToString() + ":" + MinimumMaxSize.ToString();
-            SourceSocket.Send(new Packet(MessageFlag.NegotiateMaxPayloadSize, Encoding.Default.GetBytes(NegotiationPayload)).Serialize());
+            String NegotiationPayload = DesiredSize.ToString() + ":" + MinimumSize.ToString();
+            SourceSocket.Send(Packet.Serialize(MessageFlag.NegotiateMaxPayloadSize, Encoding.Default.GetBytes(NegotiationPayload)));
 
             String NegotiatedSize = ReceiveAck()[1];
             NegotiatedMaxPayloadSize = 0;
             int.TryParse(NegotiatedSize, out NegotiatedMaxPayloadSize);
 
             return NegotiatedMaxPayloadSize;
+        }
+
+        /// <summary>
+        /// Encapsulates the audio data and sends it to the server using the message type that corresponds to your specified MimeType.
+        /// </summary>
+        /// <param name="AudioData">A byte array containing the payload for this packet.</param>
+        /// <returns></returns>
+        public byte[] SerializedAudioData(byte[] AudioData)
+        {
+            MessageFlag AudioFlag;
+
+            switch (AudioMimeType)
+            {
+                case MimeType.Mp3:
+                    AudioFlag = MessageFlag.Mp3Data;
+                    break;
+
+                case MimeType.Aacp:
+                    AudioFlag = MessageFlag.AacpData;
+                    break;
+
+                case MimeType.Aac:
+                    AudioFlag = MessageFlag.AacLcData;
+                    break;
+
+                case MimeType.Ogg:
+                    AudioFlag = MessageFlag.VorbisData;
+                    break;
+
+                default:
+                    throw new MimeTypeException();
+            }
+
+            return Packet.Serialize(AudioFlag, AudioData);
         }
 
         #endregion
@@ -477,7 +501,14 @@ namespace Netshout
         /// </summary>
         public void Disconnect()
         {
-            ClientSocket.Send(new Packet(MessageFlag.Terminate, new byte[0]).Serialize());
+            try
+            {
+                ClientSocket.Send(Packet.Serialize(MessageFlag.Terminate, new byte[0]));
+            }
+
+            catch (SocketException) { }
+            catch (NullReferenceException) { }
+
             Connected = false;
         }
         #endregion

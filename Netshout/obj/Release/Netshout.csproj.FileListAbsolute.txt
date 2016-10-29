@@ -1,0 +1,4 @@
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\Netshout\bin\Release\Netshout.dll
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\Netshout\bin\Release\Netshout.pdb
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\Netshout\obj\Release\Netshout.dll
+C:\Users\Administrator\Documents\Visual Studio 2015\Projects\Netshout\Netshout\obj\Release\Netshout.pdb
